@@ -159,7 +159,7 @@ extern ssize_t __readlink (const char *__path, char *__buf, size_t __len)
      attribute_hidden;
 extern ssize_t __readlinkat (int __fd, const char *__file_name, char *__buf, size_t __len);
 extern int __unlink (const char *__name) attribute_hidden;
-extern int __unlinkat (int __fd, const char *__name, int __flag);
+extern int __unlinkat (int __fd, const char *__name, int __flag) attribute_hidden;
 extern int __gethostname (char *__name, size_t __len) attribute_hidden;
 extern int __revoke (const char *__file);
 extern int __profil (unsigned short int *__sample_buffer, size_t __size,
