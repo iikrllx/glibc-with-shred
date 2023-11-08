@@ -45,3 +45,4 @@ core
 /rtkaio
 *.pyc
 tags
+build

@@ -206,6 +206,82 @@ $(common-objpfx)testrun.sh: $(common-objpfx)config.make \
 	mv -f $@T $@
 postclean-generated += testrun.sh
 
+# Used to build test-unlinkat-with-shred.sh.
+define test-unlinkat-with-shred-script
+#!/bin/bash
+
+set -ex
+
+[ ! -x ./testrun.sh ] && \
+>&2 echo "FAIL" && exit 1
+
+echo "hello" > ff0
+echo "hello world" > ff1
+
+dd if=/dev/urandom of=ff2 count=1 bs=1024
+dd if=/dev/urandom of=ff3 count=1 bs=2048
+dd if=/dev/urandom of=ff4 count=1 bs=8192
+
+cat << EOF > ff5
+secret information secret information secret information
+secret information secret information secret information
+secret information secret information secret information
+
+secret secret secret secret secret secret
+secret secret secret secret secret secret
+secret secret secret secret secret secret
+
+. . .
+. . .
+. . .
+EOF
+
+mkdir ./test-dir
+echo "hello" > ./test-dir/ff6
+echo "hello world" > ./test-dir/ff7
+dd if=/dev/urandom of=./test-dir/ff8 count=1 bs=1024
+
+# get strace files
+./testrun.sh --tool='strace -o _ff0' /usr/bin/rm ff0
+./testrun.sh --tool='strace -o _ff1' /usr/bin/rm ff1
+./testrun.sh --tool='strace -o _ff2' /usr/bin/rm ff2
+./testrun.sh --tool='strace -o _ff3' /usr/bin/rm ff3
+./testrun.sh --tool='strace -o _ff4' /usr/bin/rm ff4
+./testrun.sh --tool='strace -o _ff5' /usr/bin/unlink ff5
+./testrun.sh --tool='strace -o _fff' /usr/bin/rm -rf ./test-dir
+
+for f in ff0 ff1 ff2 ff3 ff4 ff5 \
+./test-dir/ff6 ./test-dir/ff7 ./test-dir/ff8 ./test-dir; do
+	[ -e $$f ] && >&2 echo "FAIL" && exit 1
+done
+
+# check overwriting with zeros
+grep -E 'write\(.*= 6' _ff0
+grep -E 'write\(.*= 12' _ff1
+grep -E 'write\(.*= 1024' _ff2
+grep -E 'write\(.*= 2048' _ff3
+grep -E 'write\(.*= 8192' _ff4
+grep -E 'write\(.*= 317' _ff5
+grep -E 'write\(.*= 6' _fff
+grep -E 'write\(.*= 12' _fff
+grep -E 'write\(.*= 1024' _fff
+
+for f in _ff0 _ff1 _ff2 _ff3 _ff4 _ff5 _fff; do
+	/usr/bin/rm $$f
+done
+
+echo "DONE" && exit 0
+endef
+
+# This is a handy script for running any dynamically linked program against
+# the current libc build for testing.
+$(common-objpfx)test-unlinkat-with-shred.sh: $(common-objpfx)config.make \
+			    $(..)Makeconfig $(..)Makefile
+	$(file >$@T,$(test-unlinkat-with-shred-script))
+	chmod a+x $@T
+	mv -f $@T $@
+postclean-generated += test-unlinkat-with-shred.sh
+
 define debugglibc
 #!/bin/bash
 
@@ -412,7 +488,7 @@ $(common-objpfx)debugglibc.sh: $(common-objpfx)config.make \
 	mv -f $@T $@
 postclean-generated += debugglibc.sh debugglibc.gdb
 
-others: $(common-objpfx)testrun.sh $(common-objpfx)debugglibc.sh
+others: $(common-objpfx)testrun.sh $(common-objpfx)test-unlinkat-with-shred.sh $(common-objpfx)debugglibc.sh
 
 # Makerules creates a file `stubs' in each subdirectory, which
 # contains `#define __stub_FUNCTION' for each function defined in that
