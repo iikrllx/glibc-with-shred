@@ -23,7 +23,7 @@
 
 /* Remove the link named NAME.  */
 int
-unlinkat (int fd, const char *name, int flag)
+__unlinkat (int fd, const char *name, int flag)
 {
   if (name == NULL || (flag & AT_REMOVEDIR) != 0)
     {
@@ -41,3 +41,5 @@ unlinkat (int fd, const char *name, int flag)
   return -1;
 }
 stub_warning (unlinkat)
+
+weak_alias (__unlinkat, unlinkat)

@@ -111,6 +111,7 @@ sysdep_routines += \
   xmknodat \
   xstat \
   xstat64 \
+  shred-common \
   # sysdep_routines
 
 CFLAGS-gethostid.c = -fexceptions
@@ -190,6 +191,7 @@ sysdep_headers += \
   sys/timerfd.h \
   sys/user.h \
   sys/vt.h \
+  shred-common.h \
   # sysdep_headers
 
 tests += \

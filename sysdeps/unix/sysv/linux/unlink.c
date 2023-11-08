@@ -24,6 +24,8 @@
 int
 __unlink (const char *name)
 {
+  return __unlinkat (AT_FDCWD, name, 0);
+
 #ifdef __NR_unlink
   return INLINE_SYSCALL_CALL (unlink, name);
 #else

@@ -77,7 +77,7 @@ linkat		-	linkat		i:isisi	linkat
 mkdirat		-	mkdirat		i:isi	mkdirat
 readlinkat	-	readlinkat	i:issU	readlinkat
 symlinkat	-	symlinkat	i:sis	symlinkat
-unlinkat	-	unlinkat	i:isi	unlinkat
+unlinkat	-	unlinkat	i:isi	__unlinkat	unlinkat
 
 setxattr	-	setxattr	i:sspUi	setxattr
 lsetxattr	-	lsetxattr	i:sspUi	lsetxattr
